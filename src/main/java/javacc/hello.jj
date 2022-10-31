@@ -1,0 +1,65 @@
+options{
+     STATIC = false;
+     DEBUG_PARSER = true;
+     JDK_VERSION = "1.8";
+     UNICODE_INPUT=true;
+}
+
+PARSER_BEGIN(Hello)
+
+package javacc.target;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
+public class Hello {
+    public static void main(String[] args) throws Exception{
+        Hello helloParser = new Hello(System.in);
+        String res = helloParser.HelloJavaCC();
+        System.out.println(res);
+    }
+}
+ 
+PARSER_END(Hello)
+
+SKIP : {
+    " "
+    }
+
+TOKEN : {
+    <IDENTITY : (["a"-"z", "A"-"Z", "\u4e00"-"\u9fa5"])+>
+    }
+
+TOKEN : {
+    <EXCLAMATION : "!"> |
+    <COMMA : ",">
+    }
+
+TOKEN : {
+    <EOL : "\n" | "\r" | "\r\n" >
+    }
+
+
+String HelloJavaCC(): {
+ Token token;
+ StringBuilder builder = new StringBuilder("Hello ");
+}
+{
+    token = <IDENTITY>
+    {
+        builder.append(token.image);
+    }
+
+    (
+     <COMMA> token = <IDENTITY>
+     {
+        builder.append(" , ");
+        builder.append(token.image);
+     }
+    )*
+
+    {
+        builder.append(" ! ").append(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(LocalDateTime.now()));
+        return builder.toString();
+    }
+}
